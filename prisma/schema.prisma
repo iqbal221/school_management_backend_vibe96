@@ -1,0 +1,495 @@
+// // This is your Prisma schema file,
+// // learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider      = "prisma-client-js"
+    binaryTargets = ["native", "debian-openssl-1.0.x", "debian-openssl-1.1.x"]
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+    id                 String    @id @default(uuid())
+    userId             String
+    role               String
+    password           String
+    name               String?
+    dateOfBirth        DateTime?
+    gender             String?
+    religious          String?
+    bloodGroup         String?
+    email              String?
+    contactNo          String?
+    emergencyContactNo String?
+    address            String?
+    designation        String?
+    profileImage       String[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("users")
+}
+
+model AppsUser{
+  id                  String  @id @default(uuid())
+  name                String
+  email               String  @unique
+  password            String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+    @@map("apps_users")
+}
+
+model Student {
+    id                 String   @id @default(uuid())
+    studentIdNumber    String @unique @default(uuid())
+    name               String
+    admission          String
+    roll               String
+    fatherName         String
+    motherName         String
+    email              String
+    contact            String
+    emergencyContactNo String
+    gender             String
+    religious          String
+    dateOfBirth        DateTime
+    bloodGroup         String
+    address            String
+    image              String[]
+    classId         String?
+    sectionId       String?
+    photoUrl        String?
+    faceEmbedding   Json?
+    parentId        String?
+    StudentAttendance StudentAttendance[]
+
+    createdAt         DateTime            @default(now())
+    updatedAt         DateTime            @updatedAt
+    
+    class           Class?   @relation(fields: [classId], references: [id])
+    section         Section? @relation(fields: [sectionId], references: [id])
+    parent          Parent?  @relation(fields: [parentId], references: [id])
+
+    @@map("students")
+}
+
+model Parent {
+    id          String   @id @default(cuid())
+
+    fatherName  String?
+    motherName  String?
+
+    phone       String?
+    email       String?
+
+    students    Student[]
+
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
+
+model Teacher {
+    id          String   @id @default(uuid())
+    teacherId          String @unique @default(uuid())
+    name        String
+    designation String
+    email       String   
+    contact     String
+    bloodGroup  String
+    address     String
+    image       String[]
+
+    // Face recognition
+    faceId      String?  @unique
+    faceEmbedding String?
+
+    isActive    Boolean  @default(true)
+
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    TeacherAttendance TeacherAttendance[]
+
+    @@map("teachers")
+}
+
+model Official {
+    id          String   @id @default(uuid())
+     officialtId          String @unique @default(uuid())
+    name        String
+    designation String
+    email       String 
+    contact     String
+    bloodGroup  String
+    address     String
+    image       String[]
+
+    // Face recognition
+    faceId        String?  @unique
+    faceEmbedding String?
+
+    isActive Boolean @default(true)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    OfficialAttendance OfficialAttendance[]
+
+    @@map("officials")
+}
+
+model FaceProfile {
+    id          String   @id @default(uuid())
+
+    personType  PersonType
+    personId    String
+
+    faceImage   String?
+    embedding   Json?
+
+    isActive    Boolean  @default(true)
+
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+
+    @@index([personType, personId])
+    @@map("face_profiles")
+}
+
+enum PersonType {
+    STUDENT
+    TEACHER
+    OFFICIAL
+}
+
+model EntryFees {
+    id        String   @id @default(uuid())
+    name      String
+    admission String
+    roll      String
+    feesType  String
+    fees      String
+    entryDate DateTime
+    comment   String
+    amount    Int      @default(0)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("entry_feess")
+}
+
+model EntryExpense {
+    id          String   @id @default(uuid())
+    serialNo    String
+    entryDate   DateTime
+    expenseHead String
+    expenseType String
+    amount      Int      @default(0)
+    comment     String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("entry_expenses")
+}
+
+model EntryRevenue {
+    id        String   @id @default(uuid())
+    serialNo  String
+    entryDate DateTime
+    revenue   String
+    amount    Int      @default(0)
+    comment   String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("entry_revenues")
+}
+
+model StudentResult {
+    id               String       @id @default(uuid())
+    name             String
+    admission        String
+    roll             String
+    subjectName      SubjectName?
+    banglaMarks      Int          @default(0)
+    banglaGrade      String
+    englishMarks     Int          @default(0)
+    englishGrade     String
+    mathematicsMarks Int          @default(0)
+    mathematicsGrade String
+    scienceMarks     Int          @default(0)
+    scienceGrade     String
+    religiousMarks   Int          @default(0)
+    religiousGrade   String
+    point            String
+    grade            String
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("student_results")
+}
+
+enum SubjectName {
+    Bangla
+    English
+    Mathematics
+    Science
+    Religious
+}
+
+model Authorization {
+    id        String   @id @default(uuid())
+    studentId String?
+    status    Boolean  @default(false)
+    approval  Boolean? @default(false)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("authorizations")
+}
+
+
+model RecentNews {
+  id        String   @id @default(cuid())
+  text      String
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([order])
+  @@index([isActive])
+  @@map("recent_news")
+}
+
+model SchoolHeader {
+  id        String   @id @default(uuid())
+  logo      String[]
+  schoolName String
+  slogan    String?
+  isActive  Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("school_headers")
+}
+
+model SliderBanner {
+  id        String   @id @default(cuid())
+  image     String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+    @@map("slider_banner")
+}
+
+model News {
+  news_id      String   @id @default(cuid())
+  text         String
+  documentUrl  String?
+  documentName String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("news")
+}
+
+model Notice {
+  notice_id    String   @id @default(cuid())
+  text         String
+  documentUrl  String?
+  documentName String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("notices")
+}
+
+model SchoolHistory {
+  id           String   @id @default(cuid())
+  sectionTitle String
+  aboutSchool  String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("school_history")
+}
+
+model SchoolLeadership {
+  id            String   @id @default(cuid())
+  founderName   String
+  founderImage  String?
+  principalName String
+  principalImage String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("school_leadership")
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+  EXCUSED
+}
+
+enum AttendanceMethod {
+  FACE
+  BIOMETRIC
+  WEB
+  MANUAL
+}
+
+model StudentAttendance {
+  id               String           @id @default(cuid())
+  studentId        String
+  attendanceDate   DateTime
+  admissionId       String
+  checkInTime      DateTime?
+  checkOutTime     DateTime?
+
+  status           AttendanceStatus @default(PRESENT)
+  method           AttendanceMethod
+
+  confidence       Float?
+  deviceId         String?
+  verificationId   String?
+
+  notificationSent   Boolean   @default(false)
+  notificationSentAt DateTime?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  student          Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, attendanceDate])
+  @@index([attendanceDate])
+  @@index([studentId])
+  @@index([deviceId])
+  @@map("student_attendance")
+}
+
+model TeacherAttendance {
+  id                String           @id @default(cuid())
+
+  teacherId         String
+  attendanceDate    DateTime
+
+  checkInTime       DateTime?
+  checkOutTime      DateTime?
+
+  status            AttendanceStatus @default(PRESENT)
+  method            AttendanceMethod
+
+  confidence        Float?
+  deviceId          String?
+  verificationId    String?
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+ teacher          Teacher @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+
+  @@unique([teacherId, attendanceDate])
+  @@index([attendanceDate])
+  @@index([teacherId])
+  @@index([deviceId])
+  @@map("teacher_attendance")
+}
+
+model OfficialAttendance {
+  id                String           @id @default(cuid())
+
+  officialId        String
+  attendanceDate    DateTime
+
+  checkInTime       DateTime?
+  checkOutTime      DateTime?
+
+  status            AttendanceStatus @default(PRESENT)
+  method            AttendanceMethod
+
+  confidence        Float?
+  deviceId          String?
+  verificationId    String?
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  official         Official @relation(fields: [officialId], references: [id], onDelete: Cascade)
+
+  @@unique([officialId, attendanceDate])
+  @@index([attendanceDate])
+  @@index([officialId])
+  @@index([deviceId])
+  @@map("official_attendance")
+}
+
+model Class {
+  id        String   @id @default(uuid())
+  name      String
+
+  sections  Section[]
+  students  Student[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("classes")
+}
+
+model Section {
+  id        String   @id @default(uuid())
+  name      String
+
+  classId   String?
+  class     Class?   @relation(fields: [classId], references: [id])
+
+  students  Student[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([classId])
+  @@map("sections")
+}
+
+model AttendanceDevice {
+  id          String   @id @default(cuid())
+
+  name        String
+  deviceCode  String   @unique
+
+  type        AttendanceDeviceType
+
+  isActive    Boolean  @default(true)
+
+  schoolId    String
+
+  lastSeenAt  DateTime?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum AttendanceDeviceType {
+  FACE
+  BIOMETRIC
+  WEB
+}
