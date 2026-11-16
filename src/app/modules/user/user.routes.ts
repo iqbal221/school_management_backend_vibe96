@@ -61,7 +61,7 @@ const router = express.Router();
 
 router.post(
   '/',
-  auth(ENUM_USER_ROLE.SUPER_ADMIN),
+  // auth(ENUM_USER_ROLE.SUPER_ADMIN),
 
   // Upload profile image
   FileUploadHelper.upload.single('file'),

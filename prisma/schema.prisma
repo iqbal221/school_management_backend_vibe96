@@ -122,7 +122,7 @@ model Teacher {
 
 model Official {
     id          String   @id @default(uuid())
-     officialtId          String @unique @default(uuid())
+    officialId  String @unique @default(uuid())
     name        String
     designation String
     email       String 

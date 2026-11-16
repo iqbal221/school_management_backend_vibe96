@@ -4,6 +4,9 @@ const create = z.object({
   name: z.string({
     required_error: 'Name is required',
   }),
+  officialId: z.string({
+    required_error: 'OfficialId is required',
+  }),
   designation: z.string({
     required_error: 'Designation is required',
   }),
@@ -24,6 +27,7 @@ const create = z.object({
 const update = z.object({
   body: z.object({
     name: z.string().optional(),
+    officialId: z.string().optional(),
     designation: z.string().optional(),
     email: z.string().optional(),
     contact: z.string().optional(),

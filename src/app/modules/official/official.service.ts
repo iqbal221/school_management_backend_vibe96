@@ -58,8 +58,8 @@ const InsertIntoDB = async (req: MulterRequest): Promise<Official | undefined> =
     });
     return result;
   };
-
 }
+
 
 const GetAllFromDB = async (
   filters: IOfficialFilters,
